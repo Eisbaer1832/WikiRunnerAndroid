@@ -1,5 +1,7 @@
 package com.capputinodevelopment.wikirunner.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.DoorFront
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Button
@@ -19,6 +24,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,14 +35,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capputinodevelopment.wikirunner.api.WebSocket
 import com.capputinodevelopment.wikirunner.api.fetchPageTitle
+import com.capputinodevelopment.wikirunner.components.MenuButton
 
 enum class MenuLevels  {
     SELECTLOBBY, SELECTGOAL
 }
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun MenuWrapper(modifier: Modifier, socket: WebSocket, changeRoom: (room: Int) -> Unit, startGame: () -> Unit) {
 
@@ -61,32 +70,18 @@ fun SelectRoom(modifier: Modifier, socket: WebSocket, onJoinLobby:(room: Int)  -
         verticalArrangement = Arrangement.Center
     ) {
         Text(style = MaterialTheme.typography.headlineLarge, fontSize = 80.sp, text = "Wikriunner")
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            Button(
-                modifier = Modifier
-                    .width(150.dp)
-                    .height(50.dp),
-                shape = RoundedCornerShape(16.dp, 2.dp, 2.dp, 16.dp),
-                onClick = {
-                    socket.createLobby() { room ->
-                        onJoinLobby(room)
-                    }
-                }
-            ) { Text("Create Lobby")}
-            Spacer(Modifier.width(4.dp))
-            Button(
-                modifier = Modifier
-                    .width(150.dp)
-                    .height(50.dp),
-                shape = RoundedCornerShape(2.dp, 16.dp, 16.dp, 2.dp),
-                onClick = {}
-            ) { Text("Join Lobby")}
-        }
+        MenuButton("Create Lobby", Icons.Default.Create) {
+            socket.createLobby() { room ->
+            onJoinLobby(room)
+        }}
+        MenuButton("Join Lobby", Icons.Default.DoorFront) {}
+
 
     }
 }
 
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun SelectGoal(modifier: Modifier, socket: WebSocket, room: Int) {
     val goalUrl = remember { mutableStateOf("") }
@@ -101,19 +96,26 @@ fun SelectGoal(modifier: Modifier, socket: WebSocket, room: Int) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Card(
-            modifier = Modifier.padding(40.dp)
+
+        Text(
+            fontSize = 40.sp,
+            color = MaterialTheme.colorScheme.secondary,
+            text = "Ziel:"
+        )
+        Surface(
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(20.dp),
+            shape = RoundedCornerShape(16.dp)
         ) {
             Text(
-                fontSize = 60.sp,
-                text = "Ziel:"
+                fontSize = 40.sp,
+                text = goalUrl.value,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(20.dp)
             )
-            Text(
-                fontSize = 30.sp,
-                text = goalUrl.value
-            )
-
         }
+
+
 
         Row(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.Bottom) {
             Button(
