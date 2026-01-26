@@ -1,20 +1,25 @@
 package com.capputinodevelopment.wikirunner.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import com.capputinodevelopment.wikirunner.api.fetchPageTitle
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(currentRoom: MutableState<Int?>) {
+fun TopBar(currentRoom: MutableState<Int?>? = null, goal: String? = null) {
     var title = ""
-    if (currentRoom.value != null) {
-        title = "Raumcode " + currentRoom.value?.toString()
+    if (currentRoom != null) {
+        if (currentRoom.value != null) {
+            title = "Raumcode " + currentRoom.value?.toString()
+        }
+    }else if (goal != null) {
+        title = fetchPageTitle(goal)
     }
     CenterAlignedTopAppBar(
         title = { Text(title) }

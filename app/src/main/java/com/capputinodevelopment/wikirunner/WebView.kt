@@ -2,23 +2,28 @@ package com.capputinodevelopment.wikirunner
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.view.ViewGroup
+import android.os.Build
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import com.capputinodevelopment.wikirunner.api.Pages
+import com.capputinodevelopment.wikirunner.api.fetchPageTitle
 
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebView(url: String){
+fun WebView(pages: Pages, static: Boolean = false, goalReached:(linksClicked: MutableList<String>) -> Unit){
+    val linksClicked = remember { mutableStateOf(mutableListOf<String>()) }
     var isLoading by remember { mutableStateOf(false) }
     var errorOccurred by remember { mutableStateOf(false) }
 
@@ -39,30 +44,29 @@ fun WebView(url: String){
             isLoading = false
         }
 
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
             //TODO Implement checking for destination url
             val url = request?.url.toString()
-            return if (url.startsWith("https://wikirunner.tbwebtech.de")) {
-                // Allow loading inside WebView
-                false
-            } else {
-                // Block or handle differently (e.g., open in external browser)
-                true
+            linksClicked.value.add(fetchPageTitle(url, false))
+            if(url.contains(pages.endPage)) {
+                goalReached(linksClicked.value)
             }
+            return static
         }
     }
+    val context = LocalContext.current
+    var webView = remember { WebView(context) }
 
-    var webView: WebView? = remember { null }
-
-    BackHandler(enabled = webView?.canGoBack() == true) {
-        webView?.goBack()
+    BackHandler(enabled = webView.canGoBack()) {
+        webView.goBack()
     }
 
     AndroidView(factory = { context ->
         WebView(context).apply {
             webViewClient = customWebViewClient
             settings.javaScriptEnabled = true
-            loadUrl(url)
+            loadUrl(pages.startPage)
             webView = this
         }
     }, update = {

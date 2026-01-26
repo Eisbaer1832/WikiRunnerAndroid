@@ -43,7 +43,7 @@ fun MenuButton(text: String, icon: ImageVector, onClick: () -> Unit) {
         ) {
 
             Icon(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.size(35.dp).weight(1f),
                 imageVector = icon,
                 contentDescription = ""
             )

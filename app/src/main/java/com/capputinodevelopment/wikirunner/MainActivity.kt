@@ -13,6 +13,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.capputinodevelopment.wikirunner.api.Pages
 import com.capputinodevelopment.wikirunner.api.WebSocket
 import com.capputinodevelopment.wikirunner.components.TopBar
 import com.capputinodevelopment.wikirunner.screens.Game
@@ -30,6 +31,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val currentScreen = remember { mutableStateOf(ScreenStates.MENU) }
+            val pages = remember { mutableStateOf(Pages("", "")) }
             val currentRoom: MutableState<Int?> = remember { mutableStateOf(null) }
             WikirunnerTheme {
                 Scaffold(
@@ -37,13 +39,19 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         when (currentScreen.value) {
                             ScreenStates.MENU -> TopBar(currentRoom)
-                            ScreenStates.GAME -> TopBar(currentRoom)
+                            ScreenStates.GAME -> TopBar(goal = pages.value.endPage)
                         }
                     }
                 ) { innerPadding ->
                     when (currentScreen.value) {
-                        ScreenStates.MENU -> MenuWrapper(modifier = Modifier.padding(innerPadding),socket = socket, {currentRoom.value = it}) {currentScreen.value = ScreenStates.GAME}
-                        ScreenStates.GAME -> Game(modifier = Modifier.padding(innerPadding))
+                        ScreenStates.MENU -> MenuWrapper(modifier = Modifier.padding(innerPadding),socket = socket,
+                            changeRoom = {currentRoom.value = it},
+                            startGame =  {
+                                currentScreen.value = ScreenStates.GAME
+                                pages.value = it
+                            }
+                        )
+                        ScreenStates.GAME -> Game(modifier = Modifier.padding(innerPadding), pages, socket, currentRoom.value?:0)
                     }
                 }
             }

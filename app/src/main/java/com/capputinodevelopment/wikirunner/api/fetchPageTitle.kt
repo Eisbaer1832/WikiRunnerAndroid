@@ -5,11 +5,12 @@ import androidx.annotation.RequiresApi
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-fun fetchPageTitle(url: String, fetchNetworkTitle: Boolean = true): String {
+fun fetchPageTitle(url: String, fetchNetworkTitle: Boolean = false): String {
     val rawTitleArr = url.split("/")
     val rawTitle = rawTitleArr[rawTitleArr.size -1]
     val apiURL = "https://api.wikimedia.org/core/v1/wikipedia/de/page/$rawTitle";
@@ -30,5 +31,5 @@ fun fetchPageTitle(url: String, fetchNetworkTitle: Boolean = true): String {
             e.printStackTrace()
         }
     }
-    return URLEncoder.encode(rawTitle, StandardCharsets.UTF_8)
+    return URLDecoder.decode(rawTitle, StandardCharsets.UTF_8).replace("_" ," ")
 }
