@@ -33,6 +33,7 @@ class WebSocket {
         })
     }
     fun joinLobby(room: Int, onSuccess: (goalURL: String) -> Unit) {
+        println("joining lobby")
         socket.emit("joinLobby", room.toString(), Ack { args ->
             val response = args[0] as JSONObject
             val status = response.getBoolean("status")
