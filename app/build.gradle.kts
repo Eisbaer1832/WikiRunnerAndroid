@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.capputinodevelopment.wikirunner"
-        minSdk = 30
+        minSdk = 33
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -64,4 +64,5 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("io.socket:socket.io-client:2.1.2")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation("nl.dionsegijn:konfetti-compose:2.0.5")
 }

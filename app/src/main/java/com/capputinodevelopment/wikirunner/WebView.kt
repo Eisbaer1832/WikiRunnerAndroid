@@ -46,7 +46,8 @@ fun WebView(pages: Pages, static: Boolean = false, goalReached:(linksClicked: Mu
 
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-            //TODO Implement checking for destination url
+            goalReached(linksClicked.value) // debug
+
             val url = request?.url.toString()
             linksClicked.value.add(fetchPageTitle(url, false))
             if(url.contains(pages.endPage)) {
