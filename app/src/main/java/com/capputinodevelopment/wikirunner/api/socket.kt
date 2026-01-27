@@ -11,6 +11,13 @@ class WebSocket {
     val url = "https://wikirunner.tbwebtech.de"
     val socket: Socket = IO.socket(url)
 
+
+
+    fun init() {
+        if (!socket.connected()) {
+            socket.connect()
+        }
+    }
     fun registerVoteListener(goalChanged: (String) -> Unit, votesChanged: (votes: Votes) -> Unit, startGame: (pages: Pages) -> Unit) {
         socket.on("reviewItems", Emitter.Listener { args ->
             val data = args.getOrNull(0)
@@ -51,10 +58,6 @@ class WebSocket {
         })
     }
 
-
-    fun init() {
-        socket.connect()
-    }
     fun createLobby(onSuccess: (room: Int) -> Unit ) {
         println("creating lobby")
         socket.emit("createLobby", Ack { args ->
@@ -80,8 +83,16 @@ class WebSocket {
                     onSuccess("???")
                     socket.emit("getNextItems", room.toString())
                 }
+            }else{
+                println("cant join room, probably already in room")
+                socket.emit("getNextItems", room.toString())
+
             }
         })
+    }
+
+    fun startNewGame(room: Int) {
+        socket.emit("getNextItems", room.toString())
     }
 
     fun voteForSubject(room: Int, votePositive: Boolean, username: String) {

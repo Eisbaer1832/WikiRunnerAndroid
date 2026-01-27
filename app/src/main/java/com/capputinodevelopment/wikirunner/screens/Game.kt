@@ -4,11 +4,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -26,6 +32,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,6 +69,8 @@ fun GameNavHost(
     pages: Pages,
     socket: WebSocket,
     scoreboard: Scoreboard,
+    room: Int,
+    exitGame: () -> Unit
 ) {
 
     NavHost(
@@ -72,7 +81,7 @@ fun GameNavHost(
             composable(destination.route) {
                 when (destination) {
                     Tabs.WIKI -> WebView(pages.copy(startPage = pages.endPage), true){}
-                    Tabs.RESULT -> SuccessScreen(pages, socket, scoreboard)
+                    Tabs.RESULT -> SuccessScreen(pages, socket, scoreboard, room,exitGame)
                 }
             }
         }
@@ -80,7 +89,7 @@ fun GameNavHost(
 }
 
 @Composable
-fun Game(modifier: Modifier, pages: MutableState<Pages>, socket: WebSocket, room: Int) {
+fun Game(modifier: Modifier, pages: MutableState<Pages>, socket: WebSocket, room: Int, exitGame: () -> Unit) {
     val goalReached = remember{ mutableStateOf(false) }
     var scoreboard by remember { mutableStateOf(Scoreboard()) }
     LaunchedEffect(Unit) {
@@ -128,20 +137,20 @@ fun Game(modifier: Modifier, pages: MutableState<Pages>, socket: WebSocket, room
                     )
                 }
             }
-            GameNavHost(navController, startDestination, modifier = modifier, pages.value, socket, scoreboard)
+            GameNavHost(navController, startDestination, modifier = modifier, pages.value, socket, scoreboard, room, exitGame)
         }
     }
 }
 
 @Composable
-fun SuccessScreen(pages: Pages, socket: WebSocket, scoreboard: Scoreboard) {
+fun SuccessScreen(pages: Pages, socket: WebSocket, scoreboard: Scoreboard, room: Int, exitGame: () -> Unit) {
 
     val partyLeft = Party(
         speed = 0f,
         maxSpeed = 30f,
         damping = 0.9f,
         spread = 60,
-        emitter = Emitter(duration = 2, TimeUnit.SECONDS).perSecond(200),
+        emitter = Emitter(duration = 1, TimeUnit.SECONDS).perSecond(120),
         position = Position.Relative(0.0, 0.3)
     )
     val partyRight = partyLeft.copy(
@@ -149,46 +158,61 @@ fun SuccessScreen(pages: Pages, socket: WebSocket, scoreboard: Scoreboard) {
         position = Position.Relative(1.0, 0.3)
     )
     Box(modifier = Modifier.fillMaxSize(),) {
-    KonfettiView(
-        modifier = Modifier.fillMaxSize(),
-        parties = listOf(partyLeft, partyRight),
-    )
-    Column() {
-        Text(
-            color = MaterialTheme.colorScheme.primary,
-            fontSize = 50.sp,
-            modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
-            textAlign = TextAlign.Center,
-            text = "Glückwunsch!"
+        KonfettiView(
+            modifier = Modifier.fillMaxSize(),
+            parties = listOf(partyLeft, partyRight),
         )
-        Text(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 30.dp),
-            textAlign = TextAlign.Center,
-            text = "Du bist bei \"${fetchPageTitle(pages.endPage, false)}\" angekommen \uD83C\uDF89"
-        )
-        HorizontalDivider(thickness = 3.dp, modifier = Modifier.padding(15.dp))
-        println("displaying scoreboard: " + scoreboard)
-        scoreboard.users.forEachIndexed {i, user  ->
-            Card(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-            ) {
-                Surface(
-                    color = MaterialTheme.colorScheme.primaryContainer
-                ) {
-                    val scoreSecondsTotal = scoreboard.times[i].toFloat()
-                    val secs = scoreSecondsTotal % 60
-                    val mins = (scoreSecondsTotal - secs) / 60
-                    Row(horizontalArrangement = Arrangement.Start) {
-                        Icon(Icons.Default.Person, "person", modifier = Modifier.weight(.5f))
-                        Text(user,modifier = Modifier.weight(.5f))
-                        Text(text = "$mins m., $secs s.", modifier = Modifier.weight(2f))
+        Column() {
+            Text(
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 50.sp,
+                modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
+                textAlign = TextAlign.Center,
+                text = "Glückwunsch!"
+            )
+            Text(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 30.dp),
+                textAlign = TextAlign.Center,
+                text = "Du bist bei \"${fetchPageTitle(pages.endPage, false)}\" angekommen \uD83C\uDF89"
+            )
+            HorizontalDivider(thickness = 3.dp, modifier = Modifier.padding(15.dp))
+            println("displaying scoreboard: " + scoreboard)
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                scoreboard.users.forEachIndexed {i, user  ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    ) {
+                        Surface(
+                            modifier = Modifier.padding(16.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            var displayScore = scoreboard.times[i]
+                            if (displayScore != "DNF") {
+                                val scoreSecondsTotal = scoreboard.times[i].toFloat()
+                                val secs = scoreSecondsTotal % 60
+                                val mins = (scoreSecondsTotal - secs) / 60
+                                displayScore = "$mins M., $secs S."
+                            }
+                            Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Person, "person", modifier = Modifier.padding(start = 16.dp))
+                                Text(user)
+                                Spacer(modifier = Modifier.weight(1f))
+                                Text(text = displayScore, modifier = Modifier.padding(end = 16.dp, top = 16.dp, bottom = 16.dp))
+                            }
+                        }
+                        Text(text = scoreboard.linkList[i].replace("[", "").replace("]", "").replace("\"", ""), modifier = Modifier.padding(16.dp))
+
                     }
+
                 }
-                Text(text = scoreboard.linkList[i].replace("[", "").replace("]", ""), modifier = Modifier.padding(start = 5.dp))
-
             }
-
+            Spacer(modifier = Modifier.weight(1f))
+            Button(modifier = Modifier.fillMaxWidth().padding(16.dp).height(80.dp),
+                onClick = {
+                    exitGame()
+                }
+            ) { Text("New round") }
         }
-    }
     }
 }

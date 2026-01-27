@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         val showBackInMenu = currentMenuLevel.value == MenuLevels.SELECTGOAL
                         when (currentScreen.value) {
-                            ScreenStates.MENU -> TopBar(currentRoom, showSettings = true,
+                            ScreenStates.MENU -> TopBar(currentRoom, showSettings = !showBackInMenu,
                                 showBack = showBackInMenu,
                                 openSettings = {currentScreen.value = ScreenStates.SETTINGS}) {
                                     if  (currentMenuLevel.value == MenuLevels.SELECTGOAL) {
@@ -67,7 +67,8 @@ class MainActivity : ComponentActivity() {
                             },
 
                         )
-                        ScreenStates.GAME -> Game(modifier = Modifier.padding(innerPadding), pages, socket, currentRoom.value?:0)
+                        ScreenStates.GAME -> Game(modifier = Modifier.padding(innerPadding), pages, socket, currentRoom.value?:0) {currentScreen.value = ScreenStates.MENU
+                        }
                         ScreenStates.SETTINGS -> Settings(modifier = Modifier.padding(innerPadding))
                     }
                 }

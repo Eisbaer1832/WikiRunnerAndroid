@@ -89,7 +89,7 @@ fun SelectRoom(modifier: Modifier, socket: WebSocket, onJoinLobby:(room: Int)  -
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(fontFamily = libertinoFontFamily, fontSize = 80.sp, text = "Wikiriunner")
+        Text(fontFamily = libertinoFontFamily, fontSize = 70.sp, text = "Wikiriunner", modifier = Modifier.padding(20.dp))
         MenuButton("Create Lobby", Icons.Default.Create) {
             socket.createLobby { room ->
             onJoinLobby(room)
@@ -145,7 +145,6 @@ fun SelectGoal(modifier: Modifier, socket: WebSocket, room: Int, startGame: (pag
                 modifier = Modifier.padding(20.dp)
             )
         }
-
         Text("Hier könnte ihre Nutzerliste stehen")
 
         Column(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
@@ -166,10 +165,10 @@ fun SelectGoal(modifier: Modifier, socket: WebSocket, room: Int, startGame: (pag
                         )
                     }
                 }
-                Spacer(Modifier.width(4.dp))
+                Spacer(Modifier.width(10.dp))
                 Surface(
                     color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = RoundedCornerShape(16.dp, 16.dp, 0.dp, 2.dp),
+                    shape = RoundedCornerShape(16.dp, 16.dp, 0.dp, 0.dp),
                     modifier = Modifier.fillMaxWidth().weight(1f).height(50.dp),
                 ) {
                     Box(
@@ -190,21 +189,21 @@ fun SelectGoal(modifier: Modifier, socket: WebSocket, room: Int, startGame: (pag
                     colors = ButtonDefaults.buttonColors().copy(containerColor = MaterialTheme.colorScheme.error),
                     modifier = Modifier
                         .weight(1f)
-                        .height(100.dp),
-                    shape = RoundedCornerShape(0.dp, 0.dp, 2.dp, 16.dp),
+                        .height(120.dp),
+                    shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 16.dp),
                     onClick = {
                         socket.voteForSubject(room, false, "DEBUGNAME")
                         alreadyVoted = true
                     }
                 ) { Icon(Icons.Default.ThumbDown, "Thumps down", modifier = Modifier.size(35.dp))}
-                Spacer(Modifier.width(4.dp))
+                Spacer(Modifier.width(10.dp))
                 Button(
                     enabled = !alreadyVoted,
                     colors = ButtonDefaults.buttonColors().copy(containerColor = MaterialTheme.colorScheme.primary),
                     modifier = Modifier
                         .weight(1f)
-                        .height(100.dp),
-                    shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 2.dp),
+                        .height(120.dp),
+                    shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 16.dp),
                     onClick = {
                         socket.voteForSubject(room, true, "DEBUGNAME")
                         alreadyVoted = true
