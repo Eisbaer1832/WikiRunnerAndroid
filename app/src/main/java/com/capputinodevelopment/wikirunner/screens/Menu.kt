@@ -28,6 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -51,14 +52,20 @@ enum class MenuLevels  {
 }
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun MenuWrapper(modifier: Modifier, socket: WebSocket, changeRoom: (room: Int) -> Unit, startGame: (pages: Pages) -> Unit) {
-    val currentMenuLevel = remember { mutableStateOf(MenuLevels.SELECTLOBBY) }
+fun MenuWrapper(
+    modifier: Modifier,
+    currentMenuLevel: MutableState<MenuLevels>,
+    updateMenuLevel: (MenuLevels) -> Unit,
+    socket: WebSocket,
+    changeRoom: (room: Int) -> Unit,
+    startGame: (pages: Pages) -> Unit,
+) {
     var room by remember { mutableIntStateOf(0) }
     when (currentMenuLevel.value) {
         MenuLevels.SELECTLOBBY -> SelectRoom(modifier,socket) {
             room = it
             changeRoom(room)
-            currentMenuLevel.value = MenuLevels.SELECTGOAL
+            updateMenuLevel(MenuLevels.SELECTGOAL)
         }
         MenuLevels.SELECTGOAL -> SelectGoal(modifier,socket,room) { startGame(it)}
     }

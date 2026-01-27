@@ -65,4 +65,5 @@ dependencies {
     implementation("io.socket:socket.io-client:2.1.2")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation("nl.dionsegijn:konfetti-compose:2.0.5")
+    implementation("androidx.preference:preference:1.2.0")
 }
