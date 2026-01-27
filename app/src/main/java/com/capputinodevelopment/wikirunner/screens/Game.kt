@@ -180,11 +180,11 @@ fun SuccessScreen(pages: Pages, socket: WebSocket, scoreboard: Scoreboard) {
                     val mins = (scoreSecondsTotal - secs) / 60
                     Row(horizontalArrangement = Arrangement.Start) {
                         Icon(Icons.Default.Person, "person", modifier = Modifier.weight(.5f))
-                        Text(user, modifier = Modifier.weight(.5f))
-                        Text("$mins m., $secs s.", modifier = Modifier.weight(2f))
+                        Text(user,modifier = Modifier.weight(.5f))
+                        Text(text = "$mins m., $secs s.", modifier = Modifier.weight(2f))
                     }
                 }
-                Text(scoreboard.linkList[i].replace("[", "").replace("]", "").replace("\"",""))
+                Text(text = scoreboard.linkList[i].replace("[", "").replace("]", ""), modifier = Modifier.padding(start = 5.dp))
 
             }
 

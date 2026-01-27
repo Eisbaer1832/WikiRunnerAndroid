@@ -1,15 +1,11 @@
 package com.capputinodevelopment.wikirunner.api
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLDecoder
-import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun fetchPageTitle(url: String, fetchNetworkTitle: Boolean = false): String {
     val rawTitleArr = url.split("/")
     val rawTitle = rawTitleArr[rawTitleArr.size -1]

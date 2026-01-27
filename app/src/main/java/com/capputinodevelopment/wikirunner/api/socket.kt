@@ -88,7 +88,8 @@ class WebSocket {
         socket.emit("voteUseItem", room.toString(), votePositive, username)
     }
 
-    fun goalReached(room: Int, username: String, linksClicked: MutableList<String>, success: Boolean = true) {
-        socket.emit("UserFinished", room.toString(), username, linksClicked, success)
+    fun goalReached(room: Int, username: String, linksClicked: List<String>, success: Boolean = true) {
+        println(linksClicked)
+        socket.emit("UserFinished", room.toString(), username, linksClicked.toList(), success)
     }
 }

@@ -2,17 +2,17 @@ package com.capputinodevelopment.wikirunner
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.os.Build
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
@@ -23,7 +23,8 @@ import com.capputinodevelopment.wikirunner.api.fetchPageTitle
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun WebView(pages: Pages, static: Boolean = false, goalReached:(linksClicked: MutableList<String>) -> Unit){
-    val linksClicked = remember { mutableStateOf(mutableListOf<String>()) }
+    val linksClicked = remember { mutableStateListOf(fetchPageTitle(pages.startPage, false), fetchPageTitle(pages.endPage, false)) }
+    val scope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(false) }
     var errorOccurred by remember { mutableStateOf(false) }
 
@@ -44,14 +45,12 @@ fun WebView(pages: Pages, static: Boolean = false, goalReached:(linksClicked: Mu
             isLoading = false
         }
 
-        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-            goalReached(linksClicked.value) // debug
-
+            goalReached(linksClicked) // debug
             val url = request?.url.toString()
-            linksClicked.value.add(fetchPageTitle(url, false))
-            if(url.contains(pages.endPage)) {
-                goalReached(linksClicked.value)
+            linksClicked.add(linksClicked.size - 2, fetchPageTitle(url, false))
+            if (url.contains(pages.endPage)) {
+                goalReached(linksClicked)
             }
             return static
         }
