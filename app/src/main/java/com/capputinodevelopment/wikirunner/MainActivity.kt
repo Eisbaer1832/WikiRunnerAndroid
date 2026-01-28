@@ -38,8 +38,6 @@ import com.capputinodevelopment.wikirunner.ui.theme.WikirunnerTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val socket = WebSocket()
-        socket.init()
         enableEdgeToEdge()
         setContent {
             val currentScreen = remember { mutableStateOf(ScreenStates.MENU) }
@@ -51,6 +49,10 @@ class MainActivity : ComponentActivity() {
             val prefs = PreferenceManager.getDefaultSharedPreferences(LocalContext.current)
             val username = remember { mutableStateOf( prefs.getString("username", "")?:"")}
             var scoreboard by remember { mutableStateOf(Scoreboard()) }
+            val serverInstance = prefs.getString("serverInstance", "https://wikirunner.tbwebtech.de/")?:"https://wikirunner.tbwebtech.de/"
+
+            val socket = WebSocket(serverInstance)
+            socket.init()
 
 
             LaunchedEffect(Unit) {

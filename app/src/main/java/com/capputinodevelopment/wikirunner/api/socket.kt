@@ -7,11 +7,8 @@ import io.socket.emitter.Emitter
 import org.json.JSONObject
 
 
-class WebSocket {
-    val url = "https://wikirunner.tbwebtech.de"
+class WebSocket(url:String) {
     val socket: Socket = IO.socket(url)
-
-
 
     fun init() {
         if (!socket.connected()) {

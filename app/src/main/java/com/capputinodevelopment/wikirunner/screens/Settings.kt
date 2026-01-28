@@ -24,13 +24,19 @@ import com.capputinodevelopment.wikirunner.components.SettingsCard
 @Composable
 fun Settings(modifier: Modifier) {
     val prefs = PreferenceManager.getDefaultSharedPreferences(LocalContext.current)
-    val usernameState = rememberTextFieldState(
-        prefs.getString("username", "") ?: ""
-    )
+    val usernameState = rememberTextFieldState(prefs.getString("username", "") ?: "")
+    val serverInstance = rememberTextFieldState(prefs.getString("serverInstance", "https://wikirunner.tbwebtech.de/") ?: "https://wikirunner.tbwebtech.de/")
     Column(modifier = modifier.fillMaxSize()) {
         LaunchedEffect(usernameState.text) {
             prefs.edit {
                 putString("username", usernameState.text.toString())
+            }
+        }
+        LaunchedEffect(serverInstance.text) {
+            prefs.edit {
+                var server = serverInstance.text.toString()
+                if (server.isEmpty()) server = "https://wikirunner.tbwebtech.de/"
+                putString("serverInstance", server)
             }
         }
         SettingsCard() {
@@ -44,6 +50,16 @@ fun Settings(modifier: Modifier) {
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
 
             )
+        }
+        SettingsCard() {
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                state = serverInstance,
+                lineLimits = TextFieldLineLimits.SingleLine,
+                label = { Text(stringResource(R.string.server_instance)) },
+                )
         }
     }
 }

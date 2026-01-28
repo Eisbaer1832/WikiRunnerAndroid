@@ -12,4 +12,5 @@
     <string name="username">Username</string>
     <string name="set_username">Set username</string>
     <string name="give_up">Are you sure you want to give up</string>
+    <string name="server_instance">Wikirunner server</string>
 </resources>
