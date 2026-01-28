@@ -67,6 +67,9 @@ fun WebView(pages: Pages, static: Boolean = false, gaveUp: Boolean = false, goal
             if (url.contains(pages.endPage)) {
                 goalReached(linksClicked)
             }
+            if(!url.contains("wikipedia")) {
+                return true
+            }
             return static
         }
     }
