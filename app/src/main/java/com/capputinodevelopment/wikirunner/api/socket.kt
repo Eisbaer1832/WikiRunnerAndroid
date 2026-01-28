@@ -18,6 +18,9 @@ class WebSocket {
             socket.connect()
         }
     }
+    fun closeGame(room:Int) {
+        socket.emit("closeGame", room.toString())
+    }
     fun registerVoteListener(goalChanged: (String) -> Unit, votesChanged: (votes: Votes) -> Unit, startGame: (pages: Pages) -> Unit) {
         socket.on("reviewItems", Emitter.Listener { args ->
             val data = args.getOrNull(0)
@@ -86,7 +89,6 @@ class WebSocket {
             }else{
                 println("cant join room, probably already in room")
                 socket.emit("getNextItems", room.toString())
-
             }
         })
     }

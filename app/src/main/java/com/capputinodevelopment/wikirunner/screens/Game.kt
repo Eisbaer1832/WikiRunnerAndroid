@@ -42,7 +42,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.capputinodevelopment.wikirunner.WebView
 import com.capputinodevelopment.wikirunner.api.Pages
 import com.capputinodevelopment.wikirunner.api.Scoreboard
 import com.capputinodevelopment.wikirunner.api.WebSocket
@@ -70,7 +69,7 @@ fun GameNavHost(
     socket: WebSocket,
     scoreboard: Scoreboard,
     room: Int,
-    exitGame: () -> Unit
+    exitGame: (room: Int) -> Unit
 ) {
 
     NavHost(
@@ -89,7 +88,7 @@ fun GameNavHost(
 }
 
 @Composable
-fun Game(modifier: Modifier, pages: MutableState<Pages>, socket: WebSocket, room: Int, exitGame: () -> Unit) {
+fun Game(modifier: Modifier, pages: MutableState<Pages>, socket: WebSocket, room: Int, exitGame: (room: Int) -> Unit) {
     val goalReached = remember{ mutableStateOf(false) }
     var scoreboard by remember { mutableStateOf(Scoreboard()) }
     LaunchedEffect(Unit) {
@@ -143,7 +142,7 @@ fun Game(modifier: Modifier, pages: MutableState<Pages>, socket: WebSocket, room
 }
 
 @Composable
-fun SuccessScreen(pages: Pages, socket: WebSocket, scoreboard: Scoreboard, room: Int, exitGame: () -> Unit) {
+fun SuccessScreen(pages: Pages, socket: WebSocket, scoreboard: Scoreboard, room: Int, exitGame: (room: Int) -> Unit) {
 
     val partyLeft = Party(
         speed = 0f,
@@ -210,7 +209,8 @@ fun SuccessScreen(pages: Pages, socket: WebSocket, scoreboard: Scoreboard, room:
             Spacer(modifier = Modifier.weight(1f))
             Button(modifier = Modifier.fillMaxWidth().padding(16.dp).height(80.dp),
                 onClick = {
-                    exitGame()
+                    socket.closeGame(room)
+                    exitGame(room)
                 }
             ) { Text("New round") }
         }

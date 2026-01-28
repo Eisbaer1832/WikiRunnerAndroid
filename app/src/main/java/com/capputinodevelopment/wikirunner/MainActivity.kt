@@ -1,11 +1,9 @@
 package com.capputinodevelopment.wikirunner
 
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -25,7 +23,6 @@ import com.capputinodevelopment.wikirunner.ui.theme.WikirunnerTheme
 
 
 class MainActivity : ComponentActivity() {
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val socket = WebSocket()
@@ -65,10 +62,14 @@ class MainActivity : ComponentActivity() {
                                 currentScreen.value = ScreenStates.GAME
                                 pages.value = it
                             },
+                            room = currentRoom.value?:0
 
                         )
-                        ScreenStates.GAME -> Game(modifier = Modifier.padding(innerPadding), pages, socket, currentRoom.value?:0) {currentScreen.value = ScreenStates.MENU
-                        }
+                        ScreenStates.GAME -> Game(
+                            modifier = Modifier.padding(innerPadding), pages, socket, currentRoom.value?:0) {
+                                currentScreen.value = ScreenStates.MENU; currentRoom.value = it
+                                println("room on restart 2 " + currentRoom.value)
+                            }
                         ScreenStates.SETTINGS -> Settings(modifier = Modifier.padding(innerPadding))
                     }
                 }

@@ -1,4 +1,4 @@
-package com.capputinodevelopment.wikirunner
+package com.capputinodevelopment.wikirunner.screens
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
