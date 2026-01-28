@@ -1,9 +1,8 @@
 <resources>
-    <string name="app_name">Goal:</string>
-    <string name="goal_header">Wikirunner</string>
+    <string name="app_name">Wikirunner</string>
     <string name="create_lobby">Create lobby</string>
     <string name="join_lobby">Join lobby</string>
-    <string name="game_success">Congrads!</string>
+    <string name="game_success">Congrats!</string>
     <string name="game_failure">Maybe next time</string>
     <string name="new_round">New round</string>
     <string name="room">Roomcode</string>
@@ -13,4 +12,5 @@
     <string name="set_username">Set username</string>
     <string name="give_up">Are you sure you want to give up</string>
     <string name="server_instance">Wikirunner server</string>
+    <string name="goal_header">Goal:</string>
 </resources>

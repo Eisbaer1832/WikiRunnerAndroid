@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Ziel:</string>
-    <string name="goal_header">Wikirunner</string>
+    <string name="app_name">Wikirunner</string>
+    <string name="goal_header">Ziel:</string>
     <string name="create_lobby">Lobby erstellen</string>
     <string name="join_lobby">Lobby beitreten</string>
     <string name="game_success">Glückwunsch</string>

@@ -76,10 +76,11 @@ class MainActivity : ComponentActivity() {
                         val showBackInMenu = currentMenuLevel.value == MenuLevels.SELECTGOAL
                         when (currentScreen.value) {
                             ScreenStates.MENU -> TopBar(
-                                currentRoom,
+                                currentRoom = if (currentMenuLevel.value == MenuLevels.SELECTGOAL) currentRoom else null,
                                 showSettings = !showBackInMenu,
                                 showBack = showBackInMenu,
-                                openSettings = {currentScreen.value = ScreenStates.SETTINGS}) {
+                                openSettings = { currentScreen.value = ScreenStates.SETTINGS }
+                            ) {
                                     if  (currentMenuLevel.value == MenuLevels.SELECTGOAL) {
                                         currentMenuLevel.value = MenuLevels.SELECTLOBBY
                                     }
@@ -99,24 +100,38 @@ class MainActivity : ComponentActivity() {
                         }
                     ) {screen ->
                         when (screen) {
-                            ScreenStates.MENU -> MenuWrapper(modifier = Modifier.padding(innerPadding),socket = socket,
+                            ScreenStates.MENU -> MenuWrapper(
+                                modifier = Modifier.padding(innerPadding),
+                                socket = socket,
                                 currentMenuLevel = currentMenuLevel,
-                                updateMenuLevel = {currentMenuLevel.value = it},
-                                changeRoom = {currentRoom.value = it},
-                                startGame =  {
+                                updateMenuLevel = { currentMenuLevel.value = it },
+                                changeRoom = { currentRoom.value = it },
+                                startGame = {
                                     gaveUp.value = false
                                     currentScreen.value = ScreenStates.GAME
                                     pages.value = it
                                 },
-                                room = currentRoom.value?:0
+                                room = currentRoom.value ?: 0
 
-                                )
-                            ScreenStates.GAME -> Game(Modifier.padding(innerPadding), pages, socket, currentRoom.value?:0,  gaveUp.value) {
+                            )
+                            ScreenStates.GAME -> Game(
+                                modifier = Modifier.padding(innerPadding),
+                                pages = pages,
+                                socket = socket,
+                                room = currentRoom.value ?: 0,
+                                gaveUp = gaveUp.value
+                            ) {
                                 currentScreen.value = ScreenStates.SUCCESS
                             }
                             ScreenStates.SETTINGS -> Settings(modifier = Modifier.padding(innerPadding))
                             ScreenStates.SUCCESS -> SuccessScreenWrapper(
-                                Modifier.padding(innerPadding), pages, socket, scoreboard, currentRoom.value?:0, gaveUp = gaveUp.value) {
+                                modifier = Modifier.padding(innerPadding),
+                                pages = pages,
+                                socket = socket,
+                                scoreboard = scoreboard,
+                                room = currentRoom.value ?: 0,
+                                gaveUp = gaveUp.value
+                            ) {
                                 currentScreen.value = ScreenStates.MENU; currentRoom.value = it
                                 println("room on restart 2 " + currentRoom.value)
                             }
