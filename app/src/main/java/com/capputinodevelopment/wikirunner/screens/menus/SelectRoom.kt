@@ -13,8 +13,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.capputinodevelopment.wikirunner.R
 import com.capputinodevelopment.wikirunner.api.WebSocket
 import com.capputinodevelopment.wikirunner.components.JoinDialog
 import com.capputinodevelopment.wikirunner.components.MenuButton
@@ -38,12 +40,13 @@ fun SelectRoom(modifier: Modifier, socket: WebSocket, onJoinLobby:(room: Int)  -
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
         Text(fontFamily = libertinoFontFamily, fontSize = 70.sp, text = "Wikiriunner", modifier = Modifier.padding(20.dp))
-        MenuButton("Create Lobby", Icons.Default.Create) {
+        MenuButton(text = stringResource(R.string.create_lobby), Icons.Default.Create) {
             socket.createLobby { room ->
                 onJoinLobby(room)
             }}
-        MenuButton("Join Lobby", Icons.Default.DoorFront) {
+        MenuButton(stringResource(R.string.join_lobby), Icons.Default.DoorFront) {
             joinRoomDialog.value = true
         }
 

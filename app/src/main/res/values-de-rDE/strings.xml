@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ziel:</string>
+    <string name="goal_header">Wikirunner</string>
+    <string name="create_lobby">Lobby erstellen</string>
+    <string name="join_lobby">Lobby beitreten</string>
+    <string name="game_success">Glückwunsch</string>
+    <string name="game_failure">Schade!</string>
+    <string name="new_round">Neue Runde</string>
+    <string name="room">Raumcode</string>
+    <string name="confirm">Bestätigen</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="username">Nutzername</string>
+    <string name="set_username">Nutzername festlegen</string>
+    <string name="give_up">Bist du dir ganz sicher, dass du aufgeben willst?</string>
+</resources>

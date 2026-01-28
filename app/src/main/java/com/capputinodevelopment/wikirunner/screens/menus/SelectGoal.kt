@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,9 +29,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.preference.PreferenceManager
+import com.capputinodevelopment.wikirunner.R
 import com.capputinodevelopment.wikirunner.api.Pages
 import com.capputinodevelopment.wikirunner.api.Votes
 import com.capputinodevelopment.wikirunner.api.WebSocket
@@ -44,6 +47,8 @@ fun SelectGoal(modifier: Modifier, socket: WebSocket, room: Int, startGame: (pag
     val goalUrl = remember { mutableStateOf("???") }
     var alreadyVoted by remember { mutableStateOf(true) }
     var votes by remember { mutableStateOf(Votes(0,0,0)) }
+    val prefs = PreferenceManager.getDefaultSharedPreferences(LocalContext.current)
+    val usernameState =  prefs.getString("username", "")?:""
     LaunchedEffect(Unit) {
         socket.registerVoteListener(
             goalChanged = {
@@ -66,7 +71,7 @@ fun SelectGoal(modifier: Modifier, socket: WebSocket, room: Int, startGame: (pag
         Text(
             fontSize = 40.sp,
             color = MaterialTheme.colorScheme.secondary,
-            text = "Ziel:"
+            text = stringResource(R.string.goal_header)
         )
         Surface(
             color = MaterialTheme.colorScheme.primary,
@@ -83,12 +88,12 @@ fun SelectGoal(modifier: Modifier, socket: WebSocket, room: Int, startGame: (pag
         }
         Text("Hier könnte ihre Nutzerliste stehen")
 
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
+        Column(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Bottom) {
             Row{
                 Surface(
                     color = MaterialTheme.colorScheme.errorContainer,
                     shape = RoundedCornerShape(16.dp, 16.dp, 0.dp, 0.dp),
-                    modifier = Modifier.fillMaxWidth().weight(1f).height(50.dp),
+                    modifier = Modifier.width(100.dp).height(50.dp),
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -101,11 +106,11 @@ fun SelectGoal(modifier: Modifier, socket: WebSocket, room: Int, startGame: (pag
                         )
                     }
                 }
-                Spacer(Modifier.width(10.dp))
+                Spacer(Modifier.weight(1f))
                 Surface(
                     color = MaterialTheme.colorScheme.primaryContainer,
                     shape = RoundedCornerShape(16.dp, 16.dp, 0.dp, 0.dp),
-                    modifier = Modifier.fillMaxWidth().weight(1f).height(50.dp),
+                    modifier = Modifier.width(100.dp).height(50.dp),
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -126,9 +131,9 @@ fun SelectGoal(modifier: Modifier, socket: WebSocket, room: Int, startGame: (pag
                     modifier = Modifier
                         .weight(1f)
                         .height(120.dp),
-                    shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 16.dp),
+                    shape = RoundedCornerShape(0.dp, 16.dp, 16.dp, 16.dp),
                     onClick = {
-                        socket.voteForSubject(room, false, "DEBUGNAME")
+                        socket.voteForSubject(room, false, usernameState)
                         alreadyVoted = true
                     }
                 ) { Icon(Icons.Default.ThumbDown, "Thumps down", modifier = Modifier.size(35.dp))}
@@ -139,9 +144,9 @@ fun SelectGoal(modifier: Modifier, socket: WebSocket, room: Int, startGame: (pag
                     modifier = Modifier
                         .weight(1f)
                         .height(120.dp),
-                    shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 16.dp),
+                    shape = RoundedCornerShape(16.dp, 0.dp, 16.dp, 16.dp),
                     onClick = {
-                        socket.voteForSubject(room, true, "DEBUGNAME")
+                        socket.voteForSubject(room, true, usernameState)
                         alreadyVoted = true
                     }
                 ) { Icon(Icons.Default.ThumbUp, "Thumps up", modifier = Modifier.size(35.dp))}

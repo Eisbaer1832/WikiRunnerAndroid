@@ -1,7 +1,5 @@
 package com.capputinodevelopment.wikirunner.components
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -13,57 +11,62 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.core.content.edit
+import androidx.preference.PreferenceManager
 import com.capputinodevelopment.wikirunner.R
 
 
 @Composable
-fun JoinDialog(
-    onDismissRequest: () -> Unit,
-    onConfirmation: (code: Int) -> Unit,
+fun UsernameDialog(
+    onDismissRequest: (username:String) -> Unit,
 ) {
-    var room by remember { mutableStateOf("") }
+    val prefs = PreferenceManager.getDefaultSharedPreferences(LocalContext.current)
+    var username by remember { mutableStateOf("") }
 
     AlertDialog(
         icon = {
-            Icon(Icons.Filled.MeetingRoom, contentDescription = "Example Icon")
+            Icon(Icons.Filled.Person, contentDescription = stringResource(R.string.username))
         },
         title = {
-            Text(text = "Join Room")
+            Text(text =stringResource(R.string.set_username))
         },
         text = {
             TextField(
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                value = room,
+                value = username,
                 onValueChange = {
-                    room = it
+                    username = it
                 },
-                label = { Text(stringResource(R.string.room)) },
+                label = { Text(stringResource(R.string.username)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Filled.Person,
-                        contentDescription =stringResource(R.string.room)
+                        contentDescription = stringResource(R.string.username)
                     )
                 },
                 singleLine = true,
             )},
         onDismissRequest = {
-            onDismissRequest()
+            onDismissRequest(username)
         },
         confirmButton = {
             TextButton(
                 onClick = {
-                    onConfirmation(room.toInt())
+                    onDismissRequest(username)
+                    prefs.edit {
+                        putString("username", username)
+                    }
                 }
             ) {
+
                 Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
             TextButton(
                 onClick = {
-                    onDismissRequest()
+                    onDismissRequest(username)
                 }
             ) {
                 Text(stringResource(R.string.cancel))

@@ -1,5 +1,9 @@
 package com.capputinodevelopment.wikirunner.screens
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -26,14 +30,24 @@ fun MenuWrapper(
     room: Int = 0
 ) {
     var room by remember { mutableIntStateOf(room) }
-    when (currentMenuLevel.value) {
-        MenuLevels.SELECTLOBBY -> SelectRoom(modifier,socket) {
-            room = it
-            changeRoom(room)
-            updateMenuLevel(MenuLevels.SELECTGOAL)
+    AnimatedContent(
+        targetState = currentMenuLevel.value,
+        transitionSpec = {
+            val direction = if (targetState > initialState) 1 else -1
+            slideInHorizontally { width -> width * direction }.togetherWith(
+                slideOutHorizontally { width -> -width * direction }
+            )
         }
-        MenuLevels.SELECTGOAL -> SelectGoal(modifier,socket,room) { startGame(it)}
-    }
+    ) { menu ->
+        when (menu) {
+            MenuLevels.SELECTLOBBY -> SelectRoom(modifier, socket) {
+                room = it
+                changeRoom(room)
+                updateMenuLevel(MenuLevels.SELECTGOAL)
+            }
 
+            MenuLevels.SELECTGOAL -> SelectGoal(modifier, socket, room) { startGame(it) }
+        }
+    }
 }
 

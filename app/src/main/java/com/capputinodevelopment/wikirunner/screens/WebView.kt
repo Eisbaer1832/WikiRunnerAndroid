@@ -7,7 +7,9 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -16,18 +18,29 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.preference.PreferenceManager
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import com.capputinodevelopment.wikirunner.api.Pages
 import com.capputinodevelopment.wikirunner.api.fetchPageTitle
 
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebView(pages: Pages, static: Boolean = false, goalReached:(linksClicked: MutableList<String>) -> Unit){
+fun WebView(pages: Pages, static: Boolean = false, gaveUp: Boolean = false, goalReached:(linksClicked: MutableList<String>) -> Unit){
     val linksClicked = remember { mutableStateListOf(fetchPageTitle(pages.startPage, false), fetchPageTitle(pages.endPage, false)) }
     val scope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(false) }
     var errorOccurred by remember { mutableStateOf(false) }
+    val prefs = PreferenceManager.getDefaultSharedPreferences(LocalContext.current)
+    val username = prefs.getString("username", "") ?: ""
 
+    LaunchedEffect(gaveUp) {
+        if (gaveUp) {
+            linksClicked.removeAt(linksClicked.size - 1)
+            goalReached(linksClicked)
+        }
+    }
     val customWebViewClient = object : WebViewClient() {
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
             isLoading = true
@@ -46,9 +59,11 @@ fun WebView(pages: Pages, static: Boolean = false, goalReached:(linksClicked: Mu
         }
 
         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-            goalReached(linksClicked) // debug
+            if (username == "DEBUG") {
+                goalReached(linksClicked)
+            }
             val url = request?.url.toString()
-            linksClicked.add(linksClicked.size - 2, fetchPageTitle(url, false))
+            linksClicked.add(linksClicked.size - 1, fetchPageTitle(url, false))
             if (url.contains(pages.endPage)) {
                 goalReached(linksClicked)
             }
@@ -61,15 +76,26 @@ fun WebView(pages: Pages, static: Boolean = false, goalReached:(linksClicked: Mu
     BackHandler(enabled = webView.canGoBack()) {
         webView.goBack()
     }
-
+    val isDarkTheme = isSystemInDarkTheme()
     AndroidView(factory = { context ->
         WebView(context).apply {
             webViewClient = customWebViewClient
-            settings.javaScriptEnabled = true
             loadUrl(pages.startPage)
             webView = this
+            with(settings) {
+                javaScriptEnabled = true
+                domStorageEnabled = true
+                isAlgorithmicDarkeningAllowed = true
+                if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK) && isDarkTheme) {
+                    WebSettingsCompat.setForceDark(
+                        this,
+                        WebSettingsCompat.FORCE_DARK_ON
+                    )
+                }
+            }
         }
-    }, update = {
-        webView = it
+    }, update = { view ->
+        view.settings.isAlgorithmicDarkeningAllowed = true
+        webView = view
     })
 }

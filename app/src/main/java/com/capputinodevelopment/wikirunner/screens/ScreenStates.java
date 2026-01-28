@@ -2,5 +2,5 @@ package com.capputinodevelopment.wikirunner.screens;
 
 
 public enum ScreenStates  {
-    MENU, GAME, SETTINGS
+    MENU, GAME, SETTINGS, SUCCESS
 }
