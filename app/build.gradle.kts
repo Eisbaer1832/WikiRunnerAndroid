@@ -14,8 +14,8 @@ android {
         applicationId = "com.capputinodevelopment.wikirunner"
         minSdk = 33
         targetSdk = 36
-        versionCode = 101
-        versionName = "1.1"
+        versionCode = 130
+        versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

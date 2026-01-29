@@ -1,5 +1,12 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package com.capputinodevelopment.wikirunner.screens.menus
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +24,9 @@ import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -51,6 +60,7 @@ fun SelectGoal(
     startGame: (pages: Pages) -> Unit
 ) {
     val goalUrl = remember { mutableStateOf("???") }
+    var loading by remember { mutableStateOf(true) }
     var alreadyVoted by remember { mutableStateOf(true) }
     var votes by remember { mutableStateOf(Votes(0,0,0)) }
     val prefs = PreferenceManager.getDefaultSharedPreferences(LocalContext.current)
@@ -66,9 +76,14 @@ fun SelectGoal(
             startGame = {startGame(it)}
         )
         socket.getNewItem(room)
-
     }
-
+    LaunchedEffect(goalUrl.value) {
+        loading = if (goalUrl.value == "???") {
+            true
+        } else {
+            false
+        }
+    }
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -80,19 +95,29 @@ fun SelectGoal(
             color = MaterialTheme.colorScheme.secondary,
             text = stringResource(R.string.goal_header)
         )
-        Surface(
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(20.dp).wrapContentHeight(),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Text(
-                fontSize = 40.sp,
-                text = goalUrl.value,
-                lineHeight = 50.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(20.dp)
-            )
+        if(loading) {
+            LoadingIndicator()
         }
+        AnimatedVisibility(
+            visible = !loading,
+            enter = slideInHorizontally(initialOffsetX = { it / 2 }) + fadeIn(),
+            exit = slideOutHorizontally(targetOffsetX = { it / 2 }) + fadeOut()
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(20.dp).wrapContentHeight(),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text(
+                    fontSize = 40.sp,
+                    text = goalUrl.value,
+                    lineHeight = 50.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(20.dp)
+                )
+            }
+        }
+
         //TODO Text("Hier könnte ihre Nutzerliste stehen")
 
         Column(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Bottom) {
