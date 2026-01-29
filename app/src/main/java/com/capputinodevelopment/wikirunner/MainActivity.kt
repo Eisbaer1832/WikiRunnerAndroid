@@ -12,15 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.preference.PreferenceManager
 import com.capputinodevelopment.wikirunner.api.Pages
-import com.capputinodevelopment.wikirunner.api.Scoreboard
 import com.capputinodevelopment.wikirunner.api.WebSocket
 import com.capputinodevelopment.wikirunner.components.GiveUpDialog
 import com.capputinodevelopment.wikirunner.components.TopBar
@@ -41,13 +38,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             val currentScreen = remember { mutableStateOf(ScreenStates.MENU) }
             val showGiveUpDialog = remember { mutableStateOf(false) }
-            var currentMenuLevel = remember { mutableStateOf(MenuLevels.SELECTLOBBY) }
-            var gaveUp = remember { mutableStateOf(false) }
+            val currentMenuLevel = remember { mutableStateOf(MenuLevels.SELECTLOBBY) }
+            val gaveUp = remember { mutableStateOf(false) }
             val pages = remember { mutableStateOf(Pages("", "")) }
             val currentRoom: MutableState<Int?> = remember { mutableStateOf(null) }
             val prefs = PreferenceManager.getDefaultSharedPreferences(LocalContext.current)
             val username = remember { mutableStateOf( prefs.getString("username", "")?:"")}
-            var scoreboard by remember { mutableStateOf(Scoreboard()) }
             val serverInstance = prefs.getString("serverInstance", "https://wikirunner.tbwebtech.de/")?:"https://wikirunner.tbwebtech.de/"
             val socket = remember { WebSocket(serverInstance)}
 
@@ -73,15 +69,16 @@ class MainActivity : ComponentActivity() {
                                 currentRoom = if (currentMenuLevel.value == MenuLevels.SELECTGOAL) currentRoom else null,
                                 showSettings = !showBackInMenu,
                                 showBack = showBackInMenu,
+                                socket = socket,
                                 openSettings = { currentScreen.value = ScreenStates.SETTINGS }
                             ) {
                                     if  (currentMenuLevel.value == MenuLevels.SELECTGOAL) {
                                         currentMenuLevel.value = MenuLevels.SELECTLOBBY
                                     }
                             }
-                            ScreenStates.GAME -> TopBar(goal = pages.value.endPage, showBack = false, showExit = true, exit = {showGiveUpDialog.value =true }) {}
-                            ScreenStates.SETTINGS -> TopBar(goal = "Settings") {currentScreen.value = ScreenStates.MENU}
-                            ScreenStates.SUCCESS -> TopBar(goal = pages.value.endPage) {currentScreen.value = ScreenStates.MENU; currentMenuLevel.value = MenuLevels.SELECTLOBBY}}
+                            ScreenStates.GAME -> TopBar(goal = pages.value.endPage, showBack = false, showExit = true, exit = {showGiveUpDialog.value =true },socket = socket,) {}
+                            ScreenStates.SETTINGS -> TopBar(goal = "Settings",socket = socket) {currentScreen.value = ScreenStates.MENU}
+                            ScreenStates.SUCCESS -> TopBar(goal = pages.value.endPage,socket = socket,) {currentScreen.value = ScreenStates.MENU; currentMenuLevel.value = MenuLevels.SELECTLOBBY}}
                     }
                 ) { innerPadding ->
                     AnimatedContent(

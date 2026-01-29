@@ -93,7 +93,7 @@ fun SelectGoal(
                 modifier = Modifier.padding(20.dp)
             )
         }
-        Text("Hier könnte ihre Nutzerliste stehen")
+        //TODO Text("Hier könnte ihre Nutzerliste stehen")
 
         Column(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Bottom) {
             Row{

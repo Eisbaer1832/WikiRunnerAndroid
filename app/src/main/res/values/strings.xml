@@ -13,4 +13,6 @@
     <string name="give_up">Are you sure you want to give up</string>
     <string name="server_instance">Wikirunner server</string>
     <string name="goal_header">Goal:</string>
+    <string name="user_finished_1">" finished with "</string>
+    <string name="user_finished_2">" clicks"</string>
 </resources>

@@ -14,4 +14,6 @@
     <string name="set_username">Nutzername festlegen</string>
     <string name="give_up">Bist du dir ganz sicher, dass du aufgeben willst?</string>
     <string name="server_instance">Wikirunner Server</string>
+    <string name="user_finished_1">" ist mit "</string>
+    <string name="user_finished_2">" Clicks fertig geworden"</string>
 </resources>

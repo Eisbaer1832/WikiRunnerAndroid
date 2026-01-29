@@ -60,6 +60,13 @@ class WebSocket(url:String) {
             onUpdate(scoreboard)
         })
     }
+    fun registerUserFinishListener(onUpdate:(user: String, clicks: Int) -> Unit) {
+        socket.on("finishNotification", Emitter.Listener {args ->
+            val user = args.getOrNull(0) as String
+            val clicks = args.getOrNull(1) as Int
+            onUpdate(user, clicks)
+        })
+    }
 
     fun createLobby(onSuccess: (room: Int) -> Unit ) {
         println("creating lobby")
@@ -110,6 +117,6 @@ class WebSocket(url:String) {
     fun goalReached(room: Int, username: String, linksClicked: List<String>, success: Boolean = true) {
         println(linksClicked)
         println("success" + success)
-        socket.emit("UserFinished", room.toString(), username, linksClicked.toList(), success)
+        socket.emit("UserFinished", room.toString(), username, linksClicked.toList().toString().replace("[", "").replace("]", ""), success)
     }
 }
