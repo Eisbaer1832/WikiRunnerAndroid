@@ -11,7 +11,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,16 +49,11 @@ class MainActivity : ComponentActivity() {
             val username = remember { mutableStateOf( prefs.getString("username", "")?:"")}
             var scoreboard by remember { mutableStateOf(Scoreboard()) }
             val serverInstance = prefs.getString("serverInstance", "https://wikirunner.tbwebtech.de/")?:"https://wikirunner.tbwebtech.de/"
+            val socket = remember { WebSocket(serverInstance)}
 
-            val socket = WebSocket(serverInstance)
             socket.init()
 
 
-            LaunchedEffect(Unit) {
-                socket.registerScoreBoardListener {
-                    scoreboard= it
-                }
-            }
             if (username.value == "") {
                 UsernameDialog { username.value = it }
             }
@@ -85,8 +79,7 @@ class MainActivity : ComponentActivity() {
                                         currentMenuLevel.value = MenuLevels.SELECTLOBBY
                                     }
                             }
-                            ScreenStates.GAME -> TopBar(goal = pages.value.endPage, showBack = false, showExit = true, exit = {showGiveUpDialog.value =true }) {
-                            }
+                            ScreenStates.GAME -> TopBar(goal = pages.value.endPage, showBack = false, showExit = true, exit = {showGiveUpDialog.value =true }) {}
                             ScreenStates.SETTINGS -> TopBar(goal = "Settings") {currentScreen.value = ScreenStates.MENU}
                             ScreenStates.SUCCESS -> TopBar(goal = pages.value.endPage) {currentScreen.value = ScreenStates.MENU; currentMenuLevel.value = MenuLevels.SELECTLOBBY}}
                     }
@@ -121,6 +114,7 @@ class MainActivity : ComponentActivity() {
                                 room = currentRoom.value ?: 0,
                                 gaveUp = gaveUp.value
                             ) {
+                                socket.getScoreboard(currentRoom.value?:0)
                                 currentScreen.value = ScreenStates.SUCCESS
                             }
                             ScreenStates.SETTINGS -> Settings(modifier = Modifier.padding(innerPadding))
@@ -128,7 +122,6 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.padding(innerPadding),
                                 pages = pages,
                                 socket = socket,
-                                scoreboard = scoreboard,
                                 room = currentRoom.value ?: 0,
                                 gaveUp = gaveUp.value
                             ) {

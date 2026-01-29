@@ -47,13 +47,16 @@ class WebSocket(url:String) {
 
     fun registerScoreBoardListener(onUpdate:(scoreboard: Scoreboard) -> Unit) {
         socket.on("updateScoreBoard", Emitter.Listener {args ->
+            println("reading scoreboard")
+
             val data = args.getOrNull(0) as JSONObject
-            println(data)
+            println("data" + data)
             val scoreboard = Scoreboard(
                 parseJSONArray(data.getJSONArray("users")),
                 parseJSONArray(data.getJSONArray("times")),
                 parseJSONArray(data.getJSONArray("linksClickedList"))
             )
+            println(scoreboard)
             onUpdate(scoreboard)
         })
     }
@@ -89,9 +92,15 @@ class WebSocket(url:String) {
             }
         })
     }
-
-    fun startNewGame(room: Int) {
+    fun getNewItem(room:Int){
         socket.emit("getNextItems", room.toString())
+    }
+
+    fun getScoreboard(room: Int) {
+        socket.emit("getScoreboard", room.toString(), Ack {args ->
+            val response = args[0] as JSONObject
+            println("scoreboard: " + response)
+        })
     }
 
     fun voteForSubject(room: Int, votePositive: Boolean, username: String) {
@@ -100,6 +109,7 @@ class WebSocket(url:String) {
 
     fun goalReached(room: Int, username: String, linksClicked: List<String>, success: Boolean = true) {
         println(linksClicked)
+        println("success" + success)
         socket.emit("UserFinished", room.toString(), username, linksClicked.toList(), success)
     }
 }

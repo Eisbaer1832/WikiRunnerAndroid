@@ -43,7 +43,13 @@ import com.capputinodevelopment.wikirunner.api.fetchPageTitle
 
 
 @Composable
-fun SelectGoal(modifier: Modifier, socket: WebSocket, room: Int, startGame: (pages: Pages) -> Unit) {
+fun SelectGoal(
+    modifier: Modifier,
+    socket: WebSocket,
+    room: Int,
+    goal: String,
+    startGame: (pages: Pages) -> Unit
+) {
     val goalUrl = remember { mutableStateOf("???") }
     var alreadyVoted by remember { mutableStateOf(true) }
     var votes by remember { mutableStateOf(Votes(0,0,0)) }
@@ -59,7 +65,8 @@ fun SelectGoal(modifier: Modifier, socket: WebSocket, room: Int, startGame: (pag
             votesChanged = {votes = it},
             startGame = {startGame(it)}
         )
-        socket.joinLobby(room) {goalUrl.value = it}
+        socket.getNewItem(room)
+
     }
 
     Column(

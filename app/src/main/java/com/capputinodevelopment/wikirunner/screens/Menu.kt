@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -30,6 +31,8 @@ fun MenuWrapper(
     room: Int = 0
 ) {
     var room by remember { mutableIntStateOf(room) }
+    var goal by remember { mutableStateOf("") }
+
     AnimatedContent(
         targetState = currentMenuLevel.value,
         transitionSpec = {
@@ -40,13 +43,17 @@ fun MenuWrapper(
         }
     ) { menu ->
         when (menu) {
-            MenuLevels.SELECTLOBBY -> SelectRoom(modifier, socket) {
-                room = it
+            MenuLevels.SELECTLOBBY -> SelectRoom(modifier, socket) {r, goalUrl ->
+                socket.init()
+                room = r
+                goal = goalUrl
                 changeRoom(room)
                 updateMenuLevel(MenuLevels.SELECTGOAL)
             }
 
-            MenuLevels.SELECTGOAL -> SelectGoal(modifier, socket, room) { startGame(it) }
+            MenuLevels.SELECTGOAL -> SelectGoal(modifier, socket, room,goal) {
+                socket.init()
+                startGame(it) }
         }
     }
 }

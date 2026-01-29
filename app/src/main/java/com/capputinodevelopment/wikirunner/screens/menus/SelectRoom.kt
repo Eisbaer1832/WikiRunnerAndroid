@@ -24,14 +24,14 @@ import com.capputinodevelopment.wikirunner.ui.theme.libertinoFontFamily
 
 
 @Composable
-fun SelectRoom(modifier: Modifier, socket: WebSocket, onJoinLobby:(room: Int)  -> Unit) {
+fun SelectRoom(modifier: Modifier, socket: WebSocket, onJoinLobby:(room: Int, goalUrl:String)  -> Unit) {
     val joinRoomDialog = remember { mutableStateOf(false) }
     if (joinRoomDialog.value) {
         JoinDialog({joinRoomDialog.value = false}, { it ->
             joinRoomDialog.value = false
             socket.joinLobby(it){room: String ->
                 println("joining $room")
-                onJoinLobby( it)
+                onJoinLobby( it, "")
             }
         })
     }
@@ -44,7 +44,7 @@ fun SelectRoom(modifier: Modifier, socket: WebSocket, onJoinLobby:(room: Int)  -
         Text(fontFamily = libertinoFontFamily, fontSize = 70.sp, text = "Wikiriunner", modifier = Modifier.padding(20.dp))
         MenuButton(text = stringResource(R.string.create_lobby), Icons.Default.Create) {
             socket.createLobby { room ->
-                onJoinLobby(room)
+                socket.joinLobby(room) {onJoinLobby(room, it) }
             }}
         MenuButton(stringResource(R.string.join_lobby), Icons.Default.DoorFront) {
             joinRoomDialog.value = true

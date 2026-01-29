@@ -75,7 +75,6 @@ fun GameNavHost(
     modifier: Modifier = Modifier,
     pages: Pages,
     socket: WebSocket,
-    scoreboard: Scoreboard,
     room: Int,
     exitGame: (room: Int) -> Unit,
     gaveUp: Boolean
@@ -89,14 +88,14 @@ fun GameNavHost(
             composable(destination.route) {
                 when (destination) {
                     Tabs.WIKI -> WebView(pages.copy(startPage = pages.endPage), true){}
-                    Tabs.RESULT -> SuccessScreen(pages, socket, scoreboard, room,exitGame,gaveUp)
+                    Tabs.RESULT -> SuccessScreen(pages, socket, room,exitGame,gaveUp)
                 }
             }
         }
     }
 }
 @Composable
-fun SuccessScreenWrapper(modifier: Modifier, pages: MutableState<Pages>, socket: WebSocket, scoreboard: Scoreboard, room: Int, gaveUp: Boolean, exitGame:(room: Int) -> Unit) {
+fun SuccessScreenWrapper(modifier: Modifier, pages: MutableState<Pages>, socket: WebSocket,  room: Int, gaveUp: Boolean, exitGame:(room: Int) -> Unit) {
     val navController = rememberNavController()
     val startDestination = Tabs.RESULT
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
@@ -126,18 +125,24 @@ fun SuccessScreenWrapper(modifier: Modifier, pages: MutableState<Pages>, socket:
                 )
             }
         }
-        GameNavHost(navController, startDestination, modifier = modifier, pages.value, socket, scoreboard, room, exitGame, gaveUp)
+        GameNavHost(navController, startDestination, modifier = modifier, pages.value, socket,  room, exitGame, gaveUp)
     }
 }
 @Composable
 fun SuccessScreen(
     pages: Pages,
     socket: WebSocket,
-    scoreboard: Scoreboard,
     room: Int,
     exitGame: (room: Int) -> Unit,
     gaveUp: Boolean
 ) {
+    var scoreboard by remember { mutableStateOf(Scoreboard()) }
+    LaunchedEffect(Unit) {
+        socket.registerScoreBoardListener {
+            scoreboard= it
+        }
+        socket.getScoreboard(room)
+    }
 
     val partyLeft = Party(
         speed = 0f,
