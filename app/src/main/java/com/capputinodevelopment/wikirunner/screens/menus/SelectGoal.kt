@@ -13,20 +13,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -90,30 +90,31 @@ fun SelectGoal(
         verticalArrangement = Arrangement.Center
     ) {
 
-        Text(
-            fontSize = 40.sp,
-            color = MaterialTheme.colorScheme.secondary,
-            text = stringResource(R.string.goal_header)
-        )
+
         if(loading) {
-            LoadingIndicator()
+            ContainedLoadingIndicator()
         }
         AnimatedVisibility(
             visible = !loading,
             enter = slideInHorizontally(initialOffsetX = { it / 2 }) + fadeIn(),
             exit = slideOutHorizontally(targetOffsetX = { it / 2 }) + fadeOut()
         ) {
-            Surface(
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(20.dp).wrapContentHeight(),
-                shape = RoundedCornerShape(16.dp)
+            Column(
+                modifier = modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
+                    fontSize = 25.sp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    text = stringResource(R.string.goal_header)
+                )
+                Text(
+                    color = MaterialTheme.colorScheme.primary,
                     fontSize = 40.sp,
                     text = goalUrl.value,
                     lineHeight = 50.sp,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(20.dp)
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
             }
         }

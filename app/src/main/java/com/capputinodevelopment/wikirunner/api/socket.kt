@@ -4,17 +4,47 @@ import io.socket.client.Ack
 import io.socket.client.IO
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import org.json.JSONObject
 
+sealed class SocketState {
+    object Connecting : SocketState()
+    object Connected : SocketState()
+    data class Error(val throwable: Throwable?) : SocketState()
+    object Disconnected : SocketState()
+}
 
 class WebSocket(url:String) {
     val socket: Socket = IO.socket(url)
+    private val _state = MutableStateFlow<SocketState>(SocketState.Disconnected)
+    val state: StateFlow<SocketState> = _state.asStateFlow()
 
     fun init() {
+        _state.value = SocketState.Connecting
+
+        socket.on(Socket.EVENT_CONNECT) {
+            _state.value = SocketState.Connected
+        }
+
+        socket.on(Socket.EVENT_CONNECT_ERROR) { args ->
+            _state.value = SocketState.Error(args.firstOrNull() as? Throwable)
+        }
+
+        socket.on(Socket.EVENT_DISCONNECT) {
+            _state.value = SocketState.Disconnected
+        }
+
         if (!socket.connected()) {
             socket.connect()
         }
     }
+
+    fun connected(): Boolean {
+        return socket.connected()
+    }
+
     fun closeGame(room:Int) {
         socket.emit("closeGame", room.toString())
     }
